@@ -6,6 +6,12 @@ ModelImporter:
   - first:
       74: 1827226128182048838
     second: Take 001
+  - first:
+      74: 3371285590104649193
+    second: Rock_Red|Rock_Red|Take 001|BaseLayer
+  - first:
+      74: 6613817690321183440
+    second: Rock_Red|Rock_Yellow|Take 001|BaseLayer
   externalObjects: {}
   materials:
     materialImportMode: 1

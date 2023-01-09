@@ -6,6 +6,9 @@ ModelImporter:
   - first:
       74: 1827226128182048838
     second: Take 001
+  - first:
+      74: -4833686975219179881
+    second: Rock_Simple|Rock_Simple|Take 001|BaseLayer
   externalObjects: {}
   materials:
     materialImportMode: 1
