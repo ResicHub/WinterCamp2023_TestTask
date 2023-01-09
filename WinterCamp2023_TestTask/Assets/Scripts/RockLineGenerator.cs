@@ -4,15 +4,50 @@ using UnityEngine;
 
 public class RockLineGenerator : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField]
+    private LineRenderer lineRenderer;
+
+    private float pathLength = 0f;
+    private float step = 0f;
+
+    public List<Vector3> RocksLineCoordinates(LineRenderer rocksLineRenderer, int rocksCount)
     {
-        
+        lineRenderer = rocksLineRenderer;
+        pathLength = CalculatePathLength();
+        step = pathLength / (rocksCount - 1);
+
+        List<Vector3> coordinates = new List<Vector3>();
+        coordinates.Add(lineRenderer.GetPosition(0));
+
+        float routeOnLine = 0f;
+        for (int pointIndex = 0; pointIndex < lineRenderer.positionCount - 1; pointIndex++)
+        {
+            Vector3 vectorToNextPoint = lineRenderer.GetPosition(pointIndex + 1)
+                - lineRenderer.GetPosition(pointIndex);
+
+            routeOnLine += vectorToNextPoint.magnitude;
+            if (routeOnLine > step)
+            {
+                routeOnLine -= step;
+
+                coordinates.Add(lineRenderer.GetPosition(pointIndex + 1) 
+                    - vectorToNextPoint * routeOnLine);
+            }
+        }
+        coordinates.Add(lineRenderer.GetPosition(lineRenderer.positionCount - 1));
+        return coordinates;
     }
 
-    // Update is called once per frame
-    void Update()
+    private float CalculatePathLength()
     {
-        
+        float pathLen = 0f;
+        // Calculate the sum of each curve segment.
+        for (int pointIndex = 0; pointIndex < lineRenderer.positionCount - 1; pointIndex++)
+        {
+            pathLen += (lineRenderer.GetPosition(pointIndex + 1) 
+                - lineRenderer.GetPosition(pointIndex))
+                .magnitude; 
+        }
+        return pathLen;
     }
 }

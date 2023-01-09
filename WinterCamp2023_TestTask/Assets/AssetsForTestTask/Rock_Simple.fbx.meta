@@ -9,7 +9,15 @@ ModelImporter:
   - first:
       74: -4833686975219179881
     second: Rock_Simple|Rock_Simple|Take 001|BaseLayer
-  externalObjects: {}
+  - first:
+      74: -794736869809752575
+    second: Rock_Simple|Rock_Simple|Rock_Simple|Rock_Simple|Take 001|BaseLayer
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Textures_Atlas
+    second: {fileID: 2100000, guid: 63b0b74a5935f1c4696df4793ff295dd, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -75,7 +83,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 1
+  importAnimation: 0
   humanDescription:
     serializedVersion: 3
     human: []

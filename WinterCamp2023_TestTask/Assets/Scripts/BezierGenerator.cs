@@ -3,19 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class BezierGenerator : MonoBehaviour
+public class BezierGenerator
 {
-    /// <summary>
-    /// Renders the curve line.
-    /// </summary>
-    [SerializeField]
-    private Transform rocks;
-
     private LineRenderer rocksLineRenderer;
 
-    /// <summary>
-    /// Used for crearing Bezier curve.
-    /// </summary>
+    private int smoothIndex;
+    private float smoothStep;
+
     private Dictionary<Vector3, List<Vector3>> controlPoints =
         new Dictionary<Vector3, List<Vector3>>();
 
@@ -23,18 +17,12 @@ public class BezierGenerator : MonoBehaviour
 
     private List<Vector3> anchors = new List<Vector3>();
 
-    private UnityEvent GenerationIsComplete = new UnityEvent();
-
-    public void Awake()
+    public void CreateCurve(Transform rocks, LineRenderer lineRenderer, int smoothIndexValue)
     {
-        rocksLineRenderer = rocks.GetComponent<LineRenderer>();
-    }
+        smoothIndex = smoothIndexValue;
+        rocksLineRenderer = lineRenderer;
+        smoothStep = 1 / (float)smoothIndex;
 
-    /// <summary>
-    /// Creates the Bezier curve, and drowing the points on scene.
-    /// </summary>
-    public void CreateCurve()
-    {
         anchorsCount = rocks.childCount;
         foreach (Transform anchorTransform in rocks)
         {
@@ -43,7 +31,6 @@ public class BezierGenerator : MonoBehaviour
 
         SetControlPoints();
         SmoothOut();
-        GenerationIsComplete.Invoke();
     }
 
     /// <summary>
@@ -65,7 +52,7 @@ public class BezierGenerator : MonoBehaviour
 
     private void SetControlPointsForAnchor(Vector3 anchor1, Vector3 anchor2, Vector3 anchor3)
     {
-        Vector3 tangent = (anchor3 - anchor1) / 5f;
+        Vector3 tangent = (anchor3 - anchor1) / 3f;
         controlPoints.Add(anchor2, new List<Vector3>()
         {
             anchor2 - tangent,
@@ -92,13 +79,10 @@ public class BezierGenerator : MonoBehaviour
     /// <summary>
     /// Creates a Bezier curve segment between two ahcnors.
     /// </summary>
-    /// <param name="anchor1"></param>
-    /// <param name="anchor2"></param>
-    /// <param name="index"></param>
     private void CreateCurveSevment(Vector3 anchor1, Vector3 anchor2, ref int index)
     {
-        rocksLineRenderer.positionCount += 10;
-        for (float part = 0.1f; part < 1.1f; part += 0.1f)
+        rocksLineRenderer.positionCount += smoothIndex;
+        for (float part = smoothStep; part < 1 + smoothStep; part += smoothStep)
         {
             rocksLineRenderer.SetPosition(index,
                 CubicLerp(
@@ -111,27 +95,6 @@ public class BezierGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Returns list of all LineRenderer positions.
-    /// </summary>
-    public List<Vector3> GetCurvePositions()
-    {
-        List<Vector3> positions = new List<Vector3>();
-        for (int index = 0; index < rocksLineRenderer.positionCount; index++)
-        {
-            positions.Add(rocksLineRenderer.GetPosition(index));
-        }
-        return positions;
-    }
-
-    /// <summary>
-    /// Bilinear interpolates between three points.
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <param name="c"></param>
-    /// <param name="t"></param>
-    /// <returns>Vector3, equals to Lerp(a, b, t) + (Lerp(b, c, t) - Lerp(a, b, t)) * t</returns>
     private Vector3 QuadraticLerp(Vector3 a, Vector3 b, Vector3 c, float t)
     {
         Vector3 p0 = Vector3.Lerp(a, b, t);
@@ -139,15 +102,6 @@ public class BezierGenerator : MonoBehaviour
         return Vector3.Lerp(p0, p1, t);
     }
 
-    /// <summary>
-    /// Calculates cubic interpolation between four points.
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <param name="c"></param>
-    /// <param name="d"></param>
-    /// <param name="t"></param>
-    /// <returns>Vector3, equals to QuadraticLerp(a, b, c, t) + (QuadraticLerp(b, c, d, t) - QuadraticLerp(a, b, c, t)) * t</returns>
     private Vector3 CubicLerp(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float t)
     {
         Vector3 p0 = QuadraticLerp(a, b, c, t);
@@ -155,5 +109,3 @@ public class BezierGenerator : MonoBehaviour
         return Vector3.Lerp(p0, p1, t);
     }
 }
-
-
