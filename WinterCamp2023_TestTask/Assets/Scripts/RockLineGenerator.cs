@@ -13,8 +13,10 @@ public class RockLineGenerator : MonoBehaviour
     public List<Vector3> RocksLineCoordinates(LineRenderer rocksLineRenderer, int rocksCount)
     {
         lineRenderer = rocksLineRenderer;
+
+        
         pathLength = CalculatePathLength();
-        step = pathLength / (rocksCount - 1);
+        step = pathLength / rocksCount;
 
         List<Vector3> coordinates = new List<Vector3>();
         coordinates.Add(lineRenderer.GetPosition(0));
@@ -31,7 +33,7 @@ public class RockLineGenerator : MonoBehaviour
                 routeOnLine -= step;
 
                 coordinates.Add(lineRenderer.GetPosition(pointIndex + 1) 
-                    - vectorToNextPoint * routeOnLine);
+                    - vectorToNextPoint);
             }
         }
         coordinates.Add(lineRenderer.GetPosition(lineRenderer.positionCount - 1));

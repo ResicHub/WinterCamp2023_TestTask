@@ -17,14 +17,14 @@ public class BezierGenerator
 
     private List<Vector3> anchors = new List<Vector3>();
 
-    public void CreateCurve(Transform rocks, LineRenderer lineRenderer, int smoothIndexValue)
+    public void CreateCurve(Transform rocksMarks, LineRenderer lineRenderer, int smoothIndexValue)
     {
         smoothIndex = smoothIndexValue;
         rocksLineRenderer = lineRenderer;
         smoothStep = 1 / (float)smoothIndex;
 
-        anchorsCount = rocks.childCount;
-        foreach (Transform anchorTransform in rocks)
+        anchorsCount = rocksMarks.childCount;
+        foreach (Transform anchorTransform in rocksMarks)
         {
             anchors.Add(anchorTransform.position);
         }

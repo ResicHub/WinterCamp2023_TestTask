@@ -9,13 +9,15 @@ public class EditorManager : Editor
     {
         DrawDefaultInspector();
         EditorScript editorScript = (EditorScript)target;
-        if (GUILayout.Button("Print 'Hello'"))
-        {
-            Debug.Log("Hello");
-        }
+        /*
         if (GUILayout.Button("Generate rock line"))
         {
             editorScript.GenerateRockLine();
+        }
+        */
+        if (GUILayout.Button("Recreate rocks"))
+        {
+            editorScript.ReCreateRocks();
         }
     }
 }
