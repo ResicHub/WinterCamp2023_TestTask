@@ -15,9 +15,12 @@ public class EditorManager : Editor
             editorScript.GenerateRockLine();
         }
         */
+
+        
         if (GUILayout.Button("Recreate rocks"))
         {
             editorScript.ReCreateRocks();
         }
+        
     }
 }

@@ -3,31 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class BezierGenerator
+[RequireComponent(typeof(LineRenderer))]
+public class BezierGenerator : MonoBehaviour
 {
-    private LineRenderer rocksLineRenderer;
+    private LineRenderer lineRenderer;
 
-    private int smoothIndex;
-    private float smoothStep;
+    [SerializeField]
+    private Vector3 curveHeight = new Vector3(0f, 0.003f, 0f);
+    private int smoothIndex = 10;
 
     private Dictionary<Vector3, List<Vector3>> controlPoints =
         new Dictionary<Vector3, List<Vector3>>();
 
-    private int anchorsCount;
+    private Vector3[] anchors = new Vector3[2];
 
-    private List<Vector3> anchors = new List<Vector3>();
-
-    public void CreateCurve(Transform rocksMarks, LineRenderer lineRenderer, int smoothIndexValue)
+    private void Awake()
     {
-        smoothIndex = smoothIndexValue;
-        rocksLineRenderer = lineRenderer;
-        smoothStep = 1 / (float)smoothIndex;
+        lineRenderer = GetComponent<LineRenderer>();
+    }
 
-        anchorsCount = rocksMarks.childCount;
-        foreach (Transform anchorTransform in rocksMarks)
-        {
-            anchors.Add(anchorTransform.position);
-        }
+    public void CreateMovementTrajectory(Vector3 startPosition, Vector3 targetPosition)
+    {
+        anchors[0] = startPosition;
+        anchors[1] = targetPosition;
 
         SetControlPoints();
         SmoothOut();
@@ -39,15 +37,9 @@ public class BezierGenerator
     private void SetControlPoints()
     {
         controlPoints.Clear();
-        // Setting up control points for each ahcnor of curve except extreme ahcnors (start and end).
-        for (int index = 0; index < anchorsCount - 2; index++)
-        {
-            SetControlPointsForAnchor(anchors[index], anchors[index + 1], anchors[index + 2]);
-        }
-
         // Setting up control points for extreme ahcnors.
-        SetControlPointsForAnchor(anchors[0], anchors[0], anchors[1]);
-        SetControlPointsForAnchor(anchors[anchorsCount - 2], anchors[anchorsCount - 1], anchors[anchorsCount - 1]);
+        SetControlPointsForAnchor(anchors[0], anchors[0], anchors[0] + curveHeight);
+        SetControlPointsForAnchor(anchors[1] + curveHeight, anchors[1], anchors[1]);
     }
 
     private void SetControlPointsForAnchor(Vector3 anchor1, Vector3 anchor2, Vector3 anchor3)
@@ -65,15 +57,12 @@ public class BezierGenerator
     /// </summary>
     private void SmoothOut()
     {
-        rocksLineRenderer.positionCount = 1;
-        rocksLineRenderer.SetPosition(0, anchors[0]);
+        lineRenderer.positionCount = 1;
+        lineRenderer.SetPosition(0, anchors[0]);
 
         int index = 1;
         // Creating of segments between two next curve anchors.
-        for (int i = 0; i < anchorsCount - 1; i++)
-        {
-            CreateCurveSevment(anchors[i], anchors[i + 1], ref index);
-        }
+        CreateCurveSevment(anchors[0], anchors[1], ref index);
     }
 
     /// <summary>
@@ -81,10 +70,11 @@ public class BezierGenerator
     /// </summary>
     private void CreateCurveSevment(Vector3 anchor1, Vector3 anchor2, ref int index)
     {
-        rocksLineRenderer.positionCount += smoothIndex;
+        float smoothStep = 1 / (float)smoothIndex;
+        lineRenderer.positionCount += smoothIndex;
         for (float part = smoothStep; part < 1 + smoothStep; part += smoothStep)
         {
-            rocksLineRenderer.SetPosition(index,
+            lineRenderer.SetPosition(index,
                 CubicLerp(
                     anchor1,
                     controlPoints[anchor1][1],
