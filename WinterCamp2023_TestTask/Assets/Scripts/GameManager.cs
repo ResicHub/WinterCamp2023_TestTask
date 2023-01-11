@@ -9,9 +9,6 @@ public class GameManager : MonoBehaviour
     private BezierGenerator bezierGenerator;
     private LineRenderer lineRenderer;
 
-    private Transform mainCamera;
-    private float mainCameraSpeed = 50f;
-
     private Vector3[] stepsPositions = new Vector3[]
     {
         new Vector3(-0.1f,0.04058f,0.172f), new Vector3(-0.075f,0.03965f,0.1776f),
@@ -83,7 +80,6 @@ public class GameManager : MonoBehaviour
         lineRenderer = GetComponent<LineRenderer>();
 
         isPlayerCanThrow = false;
-        mainCamera = Camera.main.transform;
         rockTypesKeys = rocksTypes.Keys.ToArray();
 
         string[] keys = gamePiecesDict.Keys.ToArray();
@@ -93,17 +89,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Start()
+    public void StartGame(int countOfPlayers, string[] playersData)
     {
+        playersCount = countOfPlayers;
         players = new Player[playersCount];
         playersGamePieces = new Transform[playersCount];
 
-        players[0] = new Player("Tom", "red");
-        players[1] = new Player("Greg", "blue");
-        players[2] = new Player("Tom", "yellow");
-        players[3] = new Player("Greg", "green");
-        players[4] = new Player("Tom", "pink");
-        players[5] = new Player("Greg", "while");
+        for (int number = 0; number < playersCount; number++)
+        {
+            players[number] = new Player($"{number + 1}", playersData[number]);
+        }
 
         StartCoroutine(StartGameCoroutine());
     }
@@ -121,14 +116,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            mainCamera.RotateAround(Vector3.zero, Vector3.up, -mainCameraSpeed * Time.fixedDeltaTime);
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            mainCamera.RotateAround(Vector3.zero, Vector3.up, mainCameraSpeed * Time.fixedDeltaTime);
-        }
+        
     }
 
     private IEnumerator StartGameCoroutine()
