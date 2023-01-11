@@ -25,6 +25,21 @@ public class MenuManager : MonoBehaviour
     [SerializeField]
     private Button[] colorButtons;
 
+    [SerializeField]
+    private GameObject gameUIBlock;
+    [SerializeField]
+    private TextMeshProUGUI turnText;
+    [SerializeField]
+    private TextMeshProUGUI gameInfoText;
+    [SerializeField]
+    private Button throwButton;
+
+    [SerializeField]
+    private GameObject gameResultsBlock;
+    [SerializeField]
+    private TextMeshProUGUI gameResultsText;
+
+
     private static string[] colorsTitles = new string[]
     {
         "blue", "red", "green", "yellow", "pink", "white"
@@ -35,6 +50,13 @@ public class MenuManager : MonoBehaviour
 
     private string[] playersData;
 
+    private void Start()
+    {
+        gameManager.newTurnTextEvent.AddListener(SetTurnMessage);
+        gameManager.uiMessageEvent.AddListener(SetInfoMessage);
+        gameManager.gameOverEvent.AddListener(ShowGameResults);
+    }
+
     public void NewGamePushed()
     {
         mainMenuBlock.SetActive(false);
@@ -44,7 +66,11 @@ public class MenuManager : MonoBehaviour
     public void BackToMainMenuPushed()
     {
         modeMenuBlock.SetActive(false);
+        gameUIBlock.SetActive(false);
+        gameResultsBlock.SetActive(false);
         mainMenuBlock.SetActive(true);
+        GoToMenu();
+        gameManager.QuitGame();
     }
 
     public void GameModePushed(int modeNumber)
@@ -71,6 +97,10 @@ public class MenuManager : MonoBehaviour
         if (selecterPlayer >= playerCount)
         {
             playerSettingsMenuBlock.SetActive(false);
+            gameUIBlock.SetActive(true);
+            turnText.text = "";
+            gameInfoText.text = "";
+            throwButton.interactable = false;
             StartGame();
         }
     }
@@ -85,6 +115,24 @@ public class MenuManager : MonoBehaviour
     {
         mainCamera.MoveToGameField();
         gameManager.StartGame(playerCount, playersData);
+    }
+
+    private void SetTurnMessage(int number)
+    {
+        turnText.text = $"Player {number + 1} turn";
+        throwButton.interactable = true;
+    }
+
+    private void SetInfoMessage(string message)
+    {
+        gameInfoText.text = message;
+    }
+
+    private void ShowGameResults(string results)
+    {
+        gameUIBlock.SetActive(false);
+        gameResultsText.text = results;
+        gameResultsBlock.SetActive(true);
     }
 
     public void GoToMenu()

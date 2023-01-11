@@ -2,9 +2,12 @@ ScriptsOnlyBuild:
   usedScripts:
     Assembly-CSharp.dll:
     - BezierGenerator
+    - CameraController
     - EditorScript
     - GameManager
     - LowPolyWater.LowPolyWater
+    - MenuManager
+    - Outline
     - RockLineGenerator
     Unity.Rider.Editor.dll:
     - Packages.Rider.Editor.UnitTesting.CallbackData
@@ -22,6 +25,7 @@ ScriptsOnlyBuild:
     UnityEngine.UI.dll:
     - UnityEngine.EventSystems.EventSystem
     - UnityEngine.EventSystems.StandaloneInputModule
+    - UnityEngine.UI.Button
     - UnityEngine.UI.CanvasScaler
     - UnityEngine.UI.GraphicRaycaster
     - UnityEngine.UI.Image
@@ -66,27 +70,35 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 12126}
     - Class: 114
-      Script: {instanceID: 12172}
+      Script: {instanceID: 12154}
     - Class: 114
-      Script: {instanceID: 12322}
+      Script: {instanceID: 12174}
     - Class: 114
-      Script: {instanceID: 13006}
+      Script: {instanceID: 12298}
     - Class: 114
-      Script: {instanceID: 13026}
+      Script: {instanceID: 12326}
     - Class: 114
-      Script: {instanceID: 13132}
+      Script: {instanceID: 12696}
     - Class: 114
-      Script: {instanceID: 13284}
+      Script: {instanceID: 13010}
     - Class: 114
-      Script: {instanceID: 13370}
+      Script: {instanceID: 13030}
     - Class: 114
-      Script: {instanceID: 13588}
+      Script: {instanceID: 13136}
     - Class: 114
-      Script: {instanceID: 13734}
+      Script: {instanceID: 13264}
     - Class: 114
-      Script: {instanceID: 13854}
+      Script: {instanceID: 13288}
     - Class: 114
-      Script: {instanceID: 13868}
+      Script: {instanceID: 13374}
+    - Class: 114
+      Script: {instanceID: 13592}
+    - Class: 114
+      Script: {instanceID: 13738}
+    - Class: 114
+      Script: {instanceID: 13858}
+    - Class: 114
+      Script: {instanceID: 13872}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 120
@@ -312,6 +324,12 @@ ScriptsOnlyBuild:
     className: ControlPlayableAsset
   - hash:
       serializedVersion: 2
+      Hash: f7208f12c95f05488daba4dd3e5aac10
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: MenuManager
+  - hash:
+      serializedVersion: 2
       Hash: dd7520b7d4e690e8c593273e7b9fbe80
     assemblyName: Assembly-CSharp.dll
     namespaceName: TMPro.Examples
@@ -348,7 +366,13 @@ ScriptsOnlyBuild:
     className: Benchmark01
   - hash:
       serializedVersion: 2
-      Hash: b8a63fee3beae59b0b81faf8d0510ac3
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: CameraController
+  - hash:
+      serializedVersion: 2
+      Hash: b34c622fa569d83e83f181aab8b3688f
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameManager

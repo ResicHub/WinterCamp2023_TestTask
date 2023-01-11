@@ -60,7 +60,7 @@ public class Outline : MonoBehaviour {
   private Color outlineColor = Color.white;
 
   [SerializeField, Range(0f, 10f)]
-  private float outlineWidth = 2f;
+  private float outlineWidth = 3f;
 
   [Header("Optional")]
 
@@ -93,7 +93,7 @@ public class Outline : MonoBehaviour {
     outlineFillMaterial.name = "OutlineFill (Instance)";
 
     // Retrieve or generate smooth normals
-    LoadSmoothNormals();
+    //LoadSmoothNormals();
 
     // Apply material properties immediately
     needsUpdate = true;
@@ -306,4 +306,16 @@ public class Outline : MonoBehaviour {
         break;
     }
   }
+
+    public void SetOutline(bool activeMode)
+    {
+        if (activeMode)
+        {
+            outlineWidth = 3f;
+        }
+        else
+        {
+            outlineWidth = 0.0001f;
+        }
+    }
 }

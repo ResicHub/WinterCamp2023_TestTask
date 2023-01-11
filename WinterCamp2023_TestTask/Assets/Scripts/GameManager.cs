@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(LineRenderer))]
 public class GameManager : MonoBehaviour
@@ -50,7 +51,7 @@ public class GameManager : MonoBehaviour
 
     private static Dictionary<string, GameObject> gamePiecesDict = new Dictionary<string, GameObject>()
     {
-        { "while", null },
+        { "white", null },
         { "red", null },
         { "blue", null },
         { "yellow", null },
@@ -67,19 +68,20 @@ public class GameManager : MonoBehaviour
     private int playersCount = 6;
 
     private Player[] players;
-    private int activePlayerNumber = -1;
+    private int activePlayerNumber = 0;
     private List<int> inactivePlayers = new List<int>();
 
     private Transform[] playersGamePieces;
 
-    private bool isPlayerCanThrow;
+    public IntUnityEvent newTurnTextEvent;
+    public StringUnityEvent uiMessageEvent;
+    public StringUnityEvent gameOverEvent;
 
     private void Awake()
     {
         bezierGenerator = GetComponent<BezierGenerator>();
         lineRenderer = GetComponent<LineRenderer>();
 
-        isPlayerCanThrow = false;
         rockTypesKeys = rocksTypes.Keys.ToArray();
 
         string[] keys = gamePiecesDict.Keys.ToArray();
@@ -87,6 +89,10 @@ public class GameManager : MonoBehaviour
         {
             gamePiecesDict[keys[i]] = gamePiecesObjects[i];
         }
+
+        newTurnTextEvent = new IntUnityEvent();
+        uiMessageEvent = new StringUnityEvent();
+        gameOverEvent = new StringUnityEvent();
     }
 
     public void StartGame(int countOfPlayers, string[] playersData)
@@ -103,20 +109,16 @@ public class GameManager : MonoBehaviour
         StartCoroutine(StartGameCoroutine());
     }
 
-    private void FixedUpdate()
+    public void QuitGame()
     {
-        if (isPlayerCanThrow)
+        players = null;
+        foreach (Transform piece in playersGamePieces)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (piece != null)
             {
-                isPlayerCanThrow = false;
-                int steps = Random.Range(1, 7);
-                Debug.LogWarning($"Number {steps} on the cube");
-                Turn(steps);
+                Destroy(piece.gameObject);
             }
         }
-
-        
     }
 
     private IEnumerator StartGameCoroutine()
@@ -133,6 +135,15 @@ public class GameManager : MonoBehaviour
         }
         SetActivePlayer(0);
         yield return null;
+    }
+
+    public void ThrowButtonPushed()
+    {
+        int steps = Random.Range(1, 7);
+        
+        uiMessageEvent.value = $"Number {steps} on the dice";
+        SendMessageToUI();
+        Turn(steps);
     }
 
     private void Turn(int steps)
@@ -158,7 +169,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator GamePieceMovingCoroutine(Transform gamePiece, Vector3 targetPosition)
     {
         bezierGenerator.CreateMovementTrajectory(gamePiece.position, targetPosition);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         Vector3 nextPoint;
         Vector3 direction;
         int nextPointIndex = 1;
@@ -176,8 +187,11 @@ public class GameManager : MonoBehaviour
             }
         }
         gamePiece.position = targetPosition;
-        yield return new WaitForSeconds(1f);
-        CheckStepType(players[activePlayerNumber].Step);
+        yield return new WaitForSeconds(0.5f);
+        if (players != null)
+        {
+            CheckStepType(players[activePlayerNumber].Step);
+        }
     }
 
     private void CheckStepType(int step)
@@ -186,28 +200,33 @@ public class GameManager : MonoBehaviour
         {
             if (rocksTypes[step] == "red")
             {
-                Debug.Log("Red rock: go back to 3 steps");
+                uiMessageEvent.value = "Red rock: go back to 3 steps";
+                SendMessageToUI();
                 Turn(- 3);
             }
             else if (rocksTypes[step] == "blue")
             {
-                Debug.Log("Blue rock: go forward to 3 steps");
+                uiMessageEvent.value = "Blue rock: go forward to 3 steps";
+                SendMessageToUI();
                 Turn(3);
             }
             else if (rocksTypes[step] == "pink")
             {
-                Debug.Log("Pink rock: WOW, that was really cool!");
+                uiMessageEvent.value = "Pink rock: WOW, that was really cool!";
+                SendMessageToUI();
                 SetActivePlayer((activePlayerNumber + 1) % playersCount);
             }
             else if (rocksTypes[step] == "yellow")
             {
                 if (step == 0)
                 {
-                    Debug.Log("Lol, you are on start again!");
+                    uiMessageEvent.value = "Lol, you are on start again!";
+                    SendMessageToUI();
                 }
                 else
                 {
-                    Debug.Log($"Player {activePlayerNumber + 1} WON!");
+                    uiMessageEvent.value = $"Player {activePlayerNumber + 1} WON!";
+                    SendMessageToUI();
                     inactivePlayers.Add(activePlayerNumber);
                 }
                 if (inactivePlayers.Count < playersCount)
@@ -216,13 +235,21 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("GAME OVER!");
+                    int place = 1;
+                    string gameResults = "";
+                    foreach (int number in inactivePlayers)
+                    {
+                        gameResults += $"Player {number + 1}: {place} place\n";
+                        place++;
+                    }
+                    gameOverEvent.value = gameResults;
+                    gameOverEvent.Invoke(gameOverEvent.value);
+                    QuitGame();
                 }
             }
         }
         else
         {
-            Debug.Log("Simple - dimple");
             SetActivePlayer((activePlayerNumber + 1) % playersCount);
         }
     }
@@ -235,13 +262,23 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            //playersGamePieces[activePlayerNumber].GetComponent<Outline>().SetOutline(false);
             activePlayerNumber = playerNumber;
-            isPlayerCanThrow = true;
-            Debug.Log($"Player {playerNumber + 1} turn");
+
+            //playersGamePieces[activePlayerNumber].GetComponent<Outline>().SetOutline(true);
+
+            newTurnTextEvent.value = playerNumber;
+            newTurnTextEvent.Invoke(newTurnTextEvent.value);
         }
+    }
+
+    private void SendMessageToUI()
+    {
+        uiMessageEvent.Invoke(uiMessageEvent.value);
     }
 }
 
+[System.Serializable]
 public class Player
 {
     private string _name;
@@ -259,19 +296,6 @@ public class Player
         get
         {
             return _color;
-        }
-    }
-
-    private int _score;
-    public int Score
-    {
-        get
-        {
-            return _score;
-        }
-        set
-        {
-            _score = value;
         }
     }
 
@@ -297,7 +321,18 @@ public class Player
     {
         _name = name;
         _color = color;
-        _score = 0;
         _step = 0;
     }
+}
+
+[System.Serializable]
+public class IntUnityEvent : UnityEvent<int>
+{
+    public int value;
+}
+
+[System.Serializable]
+public class StringUnityEvent : UnityEvent<string>
+{
+    public string value;
 }
